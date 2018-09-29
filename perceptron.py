@@ -60,6 +60,7 @@ def test_perceptron (test_table, W, bias, rate):
 def compute_best_learning_rate ():
   input_rate = [1, 0.1, 0.01]
   max_mean = 0
+  max_rate = 0
 
   for x in input_rate:
     accuracy = np.zeros((5, 1))
@@ -82,9 +83,10 @@ def compute_best_learning_rate ():
     accuracy_mean = np.mean (accuracy)
     if (accuracy_mean > max_mean):
       max_mean = accuracy_mean
+      max_rate = x
 
     print ('Mean accuracy for input rate {} = {}'.format (x, accuracy_mean))
-  return max_mean
+  return max_rate
 
 def train_and_dev_test (train_file, dev_file, rate, epochs):
   train_table = create_table (train_file)
@@ -108,7 +110,7 @@ def train_and_dev_test (train_file, dev_file, rate, epochs):
 
   return best_accuracy, best_wt_vec, best_bias
 
-#Main function
+#Start of the execution
 rate = compute_best_learning_rate () 
 accuracy, best_wt_vec, best_bias = train_and_dev_test ("dataset/diabetes.train",
                 "dataset/diabetes.dev", rate, 20)
@@ -117,4 +119,4 @@ test_file = "dataset/diabetes.test"
 
 test_table = create_table (test_file)
 test_accuracy = test_perceptron (test_table, best_wt_vec, best_bias, rate)
-print (test_accuracy)
+print ('Test data accuracy = {} for rate = {}'.format (test_accuracy, rate))
