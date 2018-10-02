@@ -119,21 +119,22 @@ def compute_best_hyper_params (weight_vec, bias, rate_list, margin_list, decay, 
         max_rate = rate 
         max_margin = margin
 
-      print ('Mean accuracy for input rate {} Margin {} = {}'.format (rate, margin, accuracy_mean))
+      print ('Mean accuracy for input rate {} Margin {} = {}%'.format (rate, margin, accuracy_mean * 100))
 
-  print ('Cross-validation accuracy for best learning rate {} best margin {} = {}'
-          .format (max_rate, max_margin, max_mean))
+  print ('Cross-validation accuracy for best learning rate {} best margin {} = {}%'
+          .format (max_rate, max_margin, max_mean * 100))
   return max_rate, max_margin
 
 def train_and_dev_test (train_file, dev_file, weight_vec, bias, rate, epochs,
                         margin, decay, avg, aggr, dev_set):
   train_table = create_table (train_file)
   best_accuracy = 0
+  total_updates = 0
+  best_update = 0
  
   #Init avg values
   W_a = np.zeros (weight_vec.shape[0])
   bias_a = 0
-  total_updates = 0
 
   for train_epoch in range (epochs):
     if (decay == 1):
@@ -153,10 +154,11 @@ def train_and_dev_test (train_file, dev_file, weight_vec, bias, rate, epochs,
       accuracy = test_perceptron (dev_table, weight_vec, bias)
 
     if (dev_set == 1):
-      #print ('Accuracy for dev set in epoch {} = {}'.format (train_epoch, accuracy))
-      print ('{}, {}'.format (train_epoch, accuracy))
+      #print ('Accuracy for dev set in epoch {} = {}%'.format (train_epoch, accuracy*100))
+      print ('{}, {}'.format (train_epoch, accuracy*100))
 
     if (accuracy > best_accuracy):
+      best_update = count
       best_accuracy = accuracy
       if (avg == 1):
         best_wt_vec = W_a 
@@ -167,6 +169,7 @@ def train_and_dev_test (train_file, dev_file, weight_vec, bias, rate, epochs,
 
   if (dev_set == 1):
     print ('Total number of updates = {}'.format (total_updates))
+    print ('Number of updates for the best epoch = {}'.format (best_update))
   return best_accuracy, best_wt_vec, best_bias
 
 def perceptron_master(weight_vec, bias, rate_list, margin_list, decay, avg, aggr):
@@ -176,13 +179,13 @@ def perceptron_master(weight_vec, bias, rate_list, margin_list, decay, avg, aggr
   #Train and test Dev set
   accuracy, best_wt_vec, best_bias = train_and_dev_test ("dataset/diabetes.train",
                 "dataset/diabetes.dev", weight_vec, bias, rate, 20, margin, decay, avg, aggr, 1)
-  print ('Best dev set accuracy = {}'.format (accuracy))
+  print ('Best dev set accuracy = {}%'.format (accuracy*100))
 
   #Test the actual test set
   test_file = "dataset/diabetes.test"
   test_table = create_table (test_file)
   test_accuracy = test_perceptron (test_table, best_wt_vec, best_bias)
-  print ('Test data accuracy = {}'.format (test_accuracy))
+  print ('Test data accuracy = {}%'.format (test_accuracy*100))
   return test_accuracy
 
 def count_labels (Y):
@@ -236,11 +239,11 @@ def compute_majority_baseline ():
 
   dev_accuracy = compute_majority_baseline_accuracy ("dataset/diabetes.dev",
                                                       max_label)
-  print ('Dev accuracy = {}'.format (dev_accuracy))
+  print ('Dev accuracy = {}%'.format (dev_accuracy * 100))
 
   test_accuracy = compute_majority_baseline_accuracy ("dataset/diabetes.test",
                                                       max_label)
-  print ('Test accuracy = {}'.format (test_accuracy))
+  print ('Test accuracy = {}%'.format (test_accuracy * 100))
 
 def invoke_all(seed):
   np.random.seed (seed) 
