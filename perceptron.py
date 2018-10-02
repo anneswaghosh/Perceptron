@@ -63,8 +63,9 @@ def perceptron (train_table, W, bias, W_a, bias_a, rate, margin, avg, aggr,
         # Standard perceptron
         W = W + (rate * X[eg] * Y[eg])
         bias = bias + (rate * Y[eg])
-        if (dev_set == 1):
+        if (dev_set == 1 and avg == 0):
           count += 1
+
       if (avg == 1):
         # Average Perceptron
         W_a = W_a + W
@@ -183,7 +184,64 @@ def perceptron_master(weight_vec, bias, rate_list, margin_list, decay, avg, aggr
   test_accuracy = test_perceptron (test_table, best_wt_vec, best_bias)
   print ('Test data accuracy = {}'.format (test_accuracy))
   return test_accuracy
+
+def count_labels (Y):
+  label_dict = {}
+
+  labels = np.unique (Y)
+  for x in range (labels.shape[0]):
+    label_dict [labels[x]] = 0
+
+  for x in range (Y.shape[0]):
+    label_dict[float (Y[x])] += 1
+
+  return label_dict
+
+def compute_majority_baseline_accuracy (filename, max_label):
+  table = create_table (filename)
+  splitted = np.split (table, [1], axis = 1)
+
+  Y = splitted[0]
+  labels = np.unique (Y)
+  label_dict = count_labels (Y)
+  total = 0
+
+  for x in range (labels.shape[0]):
+    total = total + label_dict[labels[x]]
+  
+  accuracy = label_dict [max_label]/total
+  return accuracy
  
+def compute_majority_baseline ():
+  train_table = create_table ("dataset/diabetes.train")
+  splitted = np.split (train_table, [1], axis = 1)
+
+  Y = splitted[0]
+  X = splitted[1]
+
+  labels = np.unique (Y)
+  label_dict = count_labels (Y)
+
+  for x in range (labels.shape[0]):
+    if (label_dict[labels[x]] >= label_dict[labels[x+1]]): 
+      max_label_val = label_dict[labels[x]]
+      max_label = labels[x]
+      #print ('max_label = {}'.format (labels[x]))
+      break
+    else:
+      max_label_val = label_dict[labels[x+1]]
+      max_label = labels[x+1]
+      #print ('max_label = {}'.format (labels[x+1]))
+      break
+
+  dev_accuracy = compute_majority_baseline_accuracy ("dataset/diabetes.dev",
+                                                      max_label)
+  print ('Dev accuracy = {}'.format (dev_accuracy))
+
+  test_accuracy = compute_majority_baseline_accuracy ("dataset/diabetes.test",
+                                                      max_label)
+  print ('Test accuracy = {}'.format (test_accuracy))
+
 def invoke_all(seed):
   np.random.seed (seed) 
   weight_vec = np.random.uniform (-0.01, 0.01, 19)
@@ -235,6 +293,9 @@ def invoke_all(seed):
   aggr  = 0
   print ("-------------- Aggressive Perceptron End --------------\n" )
 
+  print ("************* Majority Baseline Classifier Start ***************") 
+  compute_majority_baseline ()
+  print ("-------------- Majority Baseline Classifier End --------------\n" )
   #return (accuracy/5)
 
 #Start of the execution
