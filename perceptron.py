@@ -154,8 +154,8 @@ def train_and_dev_test (train_file, dev_file, weight_vec, bias, rate, epochs,
       accuracy = test_perceptron (dev_table, weight_vec, bias)
 
     if (dev_set == 1):
-      #print ('Accuracy for dev set in epoch {} = {}%'.format (train_epoch, accuracy*100))
-      print ('{}, {}'.format (train_epoch, accuracy*100))
+      print ('Accuracy for dev set in epoch {} = {}%'.format (train_epoch, accuracy*100))
+      #print ('{}, {}'.format (train_epoch, accuracy*100))
 
     if (accuracy > best_accuracy):
       best_update = count
@@ -290,6 +290,7 @@ def invoke_all(seed):
   print ("************* Aggressive Perceptron Start ***************") 
   print ('---------------------------------------------------------') 
   margin_list = [1,0.1,0.01]
+  rate_list = [1]
   aggr  = 1
   accuracy += perceptron_master (weight_vec, bias, rate_list, margin_list, decay, avg, aggr)
   margin_list = [0] 
